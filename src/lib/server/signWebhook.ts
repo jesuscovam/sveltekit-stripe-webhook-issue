@@ -73,3 +73,61 @@ export const signWebhookBuffer = async (
 		return
 	}
 }
+
+export const signWebhookUint8Array = async (req: Request) => {
+	const signature = req.headers.get('Stripe-Signature')
+	const body = new Uint8Array(await req.arrayBuffer())
+	if (!signature || !body) {
+		return
+	}
+
+	try {
+		const event = stripe.webhooks.constructEvent(
+			body as Buffer,
+			signature,
+			STRIPE_WEBHOOK_TOKEN,
+			undefined
+		)
+
+		console.log({ event })
+
+		if (event) {
+			return event
+		}
+	} catch (error) {
+		console.error('Error en comprobar que request es de stripe', {
+			error,
+			req,
+		})
+		return
+	}
+}
+
+export const signWebhookBase64 = async (req: Request) => {
+	const signature = req.headers.get('Stripe-Signature')
+	const body = new Buffer(await req.arrayBuffer()).toString('base64')
+	if (!signature || !body) {
+		return
+	}
+
+	try {
+		const event = stripe.webhooks.constructEvent(
+			body,
+			signature,
+			STRIPE_WEBHOOK_TOKEN,
+			undefined
+		)
+
+		console.log({ event })
+
+		if (event) {
+			return event
+		}
+	} catch (error) {
+		console.error('Error en comprobar que request es de stripe', {
+			error,
+			req,
+		})
+		return
+	}
+}
