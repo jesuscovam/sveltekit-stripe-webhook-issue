@@ -131,3 +131,31 @@ export const signWebhookBase64 = async (req: Request) => {
 		return
 	}
 }
+// https://github.com/supabase-community/sveltekit-subscription-payments/blob/main/src/routes/api/webhooks/%2Bserver.ts
+export const signWebhookBuffer2 = async (req: Request) => {
+	const signature = req.headers.get('stripe-signature')
+	const body = Buffer.from(await req.arrayBuffer())
+	if (!signature || !body) {
+		return
+	}
+
+	try {
+		const event = await stripe.webhooks.constructEventAsync(
+			body,
+			signature,
+			STRIPE_WEBHOOK_TOKEN
+		)
+
+		console.log({ event })
+
+		if (event) {
+			return event
+		}
+	} catch (error) {
+		console.error('Error en comprobar que request es de stripe', {
+			error,
+			req,
+		})
+		return
+	}
+}

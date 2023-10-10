@@ -1,4 +1,8 @@
-import { signWebhookBase64, signWebhookBuffer } from '$lib/server/signWebhook'
+import {
+	signWebhookBase64,
+	signWebhookBuffer,
+	signWebhookBuffer2,
+} from '$lib/server/signWebhook'
 import type { Config } from '@sveltejs/adapter-vercel'
 import { json } from '@sveltejs/kit'
 
@@ -7,7 +11,7 @@ export const config: Config = {
 }
 
 export const POST = async ({ request }) => {
-	const event = await signWebhookBase64(request)
+	const event = await signWebhookBuffer2(request)
 
 	if (!event) {
 		console.error('Error en comprobar que request es de stripe')
